@@ -240,6 +240,19 @@
     <script>
         const webhookUrl = 'https://n8n.automaterhub.com/webhook/99983a7d-9ed1-46a5-87f1-282d3ef2f181';
 
+        const waitingQuotes = [
+            "I'm doing the hard part so you can go back to... the *other* hard parts.",
+            "Engaging the quantum data-entanglement matrix. Or, you know, just reading a PDF.",
+            "Cross-referencing your invoice with the Library of Alexandria. Standard procedure.",
+            "Analyzing the document's soul... just kidding, I'm just looking for numbers.",
+            "I've seen things you people wouldn't believe... like Comic Sans on an official invoice.",
+            "Waking up the silicon neurons. They can be a bit grumpy in the morning.",
+            "Don't worry, I'm triple-checking the math. You humans and your... creative accounting.",
+            "Searching for the total. It's usually hiding near the terms and conditions nobody reads.",
+            "Processing this with all the urgency of a Friday afternoon email.",
+            "One moment. I need to ask a smarter AI for help."
+        ];
+
         // DOM Elements
         const uploadForm = document.getElementById('uploadForm');
         const fileElem = document.getElementById('fileElem');
@@ -289,8 +302,9 @@
             e.preventDefault();
             if (!selectedFile) return;
 
-            // Update UI to processing state
-            statusContainer.innerHTML = '<div class="spinner"></div><span class="status-text">working to pay my electricity bills...</span>';
+            // Update UI to processing state with a random witty quote
+            const randomQuote = waitingQuotes[Math.floor(Math.random() * waitingQuotes.length)];
+            statusContainer.innerHTML = `<div class="spinner"></div><span class="status-text">${randomQuote}</span>`;
             resultsContainer.classList.remove('visible');
             resultsContainer.innerHTML = '';
             uploadButton.disabled = true;
@@ -390,4 +404,4 @@
         }
     </script>
 </body>
-</html>
+</html>```
