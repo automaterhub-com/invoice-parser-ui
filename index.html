@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice Data Extractor</title>
+    <!-- --- ADD THIS LINE FOR THE FAVICON --- -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    
     <style>
-        /* General Page Styles */
+        /* All your existing CSS remains the same */
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 40px; 
@@ -20,20 +23,17 @@
             border-radius: 12px; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
         }
-
-        /* --- ADD THIS CSS FOR THE LOGO --- */
         .logo-img {
             display: block;
-            margin: 0 auto 25px auto; /* Centers the logo and adds space below */
-            height: 50px; /* Adjust this value to resize your logo */
+            margin: 0 auto 25px auto;
+            height: 50px;
         }
-        
         h1 { 
             text-align: center; 
             color: #2c3e50;
             margin-top: 0;
         }
-        /* ... (rest of your CSS is the same) ... */
+        /* ... rest of CSS ... */
         form { display: flex; flex-direction: column; gap: 15px; }
         input[type="file"] { border: 2px dashed #dde3ec; padding: 20px; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
         input[type="file"]:hover { border-color: #007bff; background-color: #f8f9fa; }
@@ -51,12 +51,10 @@
     </style>
 </head>
 <body>
-
     <div id="container">
-        <!-- --- ADD THIS LINE FOR THE LOGO --- -->
         <img src="logo.png" alt="Company Logo" class="logo-img">
-
         <h1>Invoice Data Extractor</h1>
+        <!-- ... The rest of your HTML body and script is unchanged ... -->
         <form id="uploadForm">
             <label for="invoiceFile">Attach your invoice file:</label>
             <input type="file" id="invoiceFile" name="file" required>
@@ -65,24 +63,20 @@
         <div id="status"></div>
         <div id="results"></div>
     </div>
-
     <script>
-        // --- Your JavaScript does not need any changes ---
         const uploadForm = document.getElementById('uploadForm');
-        // ... (rest of your script)
         const invoiceFile = document.getElementById('invoiceFile');
         const statusDiv = document.getElementById('status');
         const resultsDiv = document.getElementById('results');
         const submitButton = uploadForm.querySelector('button');
         const webhookUrl = 'https://n8n.automaterhub.com/webhook/99983a7d-9ed1-46a5-87f1-282d3ef2f181';
-
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!invoiceFile.files[0]) {
                 statusDiv.textContent = 'Please select a file first.';
                 return;
             }
-            statusDiv.innerHTML = '<div class="loader"></div><span>Breaking down the invoice</span>';
+            statusDiv.innerHTML = '<div class="loader"></div><span>Doing the hard work for you...</span>';
             resultsDiv.innerHTML = '';
             submitButton.disabled = true;
             const formData = new FormData();
@@ -106,7 +100,6 @@
                 submitButton.disabled = false;
             }
         });
-
         function displayResults(data) {
             resultsDiv.innerHTML = '';
             const formatCurrency = (costObject) => {
@@ -119,7 +112,7 @@
             if (data.invoices && data.invoices.length > 0) {
                 html += `<table><thead><tr><th>Invoice Number</th><th>Freight Cost</th><th>Insurance Cost</th><th>Incoterm</th><th>Total Amount</th></tr></thead><tbody>`;
                 data.invoices.forEach(invoice => {
-                    html += `<tr><td>${invoice.invoiceNumber || 'N/A'}</td><td>${formatCurrency(invoice.freightCost)}</td><td>${formatCurrency(invoice.insuranceCost)}</td><td>${invoice.incoterm || 'N/A'}</td><td>${formatCurrency(invoice.totalAmount)}</td></tr>`;
+                    html += `<tr><td>${invoice.invoiceNumber || 'N/A'}</td><td>${formatCurrency(invoice.freightCost)}</td><td>${formatCurrency(invoice.insuranceCost)}</td><td>${invoice.incerm || 'N/A'}</td><td>${formatCurrency(invoice.totalAmount)}</td></tr>`;
                 });
                 html += `</tbody>`;
                 if (data.grandTotal) {
@@ -134,6 +127,5 @@
             resultsDiv.innerHTML = html;
         }
     </script>
-
 </body>
 </html>
