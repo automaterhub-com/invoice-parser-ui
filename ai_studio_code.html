@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Uploader</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; background-color: #f4f4f9; }
+        #container { max-width: 800px; margin: auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; }
+        form { display: flex; flex-direction: column; gap: 15px; }
+        input[type="file"] { border: 1px solid #ddd; padding: 10px; border-radius: 4px; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:disabled { background-color: #ccc; }
+        #status { text-align: center; font-style: italic; color: #555; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <h1>Invoice Data Extractor</h1>
+        <form id="uploadForm">
+            <label for="invoiceFile">Attach your invoice file:</label>
+            <input type="file" id="invoiceFile" name="file" required>
+            <button type="submit">Extract Data</button>
+        </form>
+        <div id="status"></div>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+        const invoiceFile = document.getElementById('invoiceFile');
+        const statusDiv = document.getElementById('status');
+        const resultsDiv = document.getElementById('results');
+        const submitButton = uploadForm.querySelector('button');
+
+        // --- IMPORTANT: PASTE YOUR N8N **PRODUCTION** WEBHOOK URL HERE ---
+        const webhookUrl = 'PASTE_YOUR_N8N_PRODUCTION_URL_HERE';
+
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!invoiceFile.files[0]) {
+                statusDiv.textContent = 'Please select a file first.';
+                return;
+            }
+
+            statusDiv.textContent = 'Uploading and processing... Please wait.';
+            resultsDiv.innerHTML = '';
+            submitButton.disabled = true;
+
+            const formData = new FormData();
+            formData.append('file', invoiceFile.files[0]);
+
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                displayResults(data);
+                statusDiv.textContent = 'Processing complete!';
+
+            } catch (error) {
+                console.error('Error:', error);
+                statusDiv.textContent = 'An error occurred. Please try again.';
+            } finally {
+                submitButton.disabled = false;
+            }
+        });
+
+        function displayResults(data) {
+            let html = `<h2>Extracted Data</h2>`;
+            html += `<p><strong>Invoice Number:</strong> ${data.invoiceNumber || 'N/A'}</p>`;
+            html += `<p><strong>Invoice Date:</strong> ${data.invoiceDate || 'N/A'}</p>`;
+            html += `<p><strong>Total Amount:</strong> ${data.totalAmount || 'N/A'}</p>`;
+
+            if (data.lineItems && data.lineItems.length > 0) {
+                html += `<h3>Line Items</h3><table><thead><tr><th>Description</th><th>Quantity</th><th>Price</th></tr></thead><tbody>`;
+                data.lineItems.forEach(item => {
+                    html += `<tr><td>${item.description || ''}</td><td>${item.quantity || ''}</td><td>${item.price || ''}</td></tr>`;
+                });
+                html += `</tbody></table>`;
+            }
+
+            resultsDiv.innerHTML = html;
+        }
+    </script>
+
+</body>
+</html>
