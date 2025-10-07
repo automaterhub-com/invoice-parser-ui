@@ -13,7 +13,7 @@
             color: #333;
         }
         #container { 
-            max-width: 800px; 
+            max-width: 900px; /* Widened for more columns */
             margin: auto; 
             padding: 30px; 
             background: white; 
@@ -108,11 +108,11 @@
             font-weight: bold;
             background-color: #f8f9fa;
         }
-
     </style>
 </head>
 <body>
 
+    <!-- Main application container, now visible by default -->
     <div id="container">
         <h1>Invoice Data Extractor</h1>
         <form id="uploadForm">
@@ -135,13 +135,11 @@
 
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-
             if (!invoiceFile.files[0]) {
                 statusDiv.textContent = 'Please select a file first.';
                 return;
             }
 
-            // --- IMPROVEMENT: Updated status message and added spinner ---
             statusDiv.innerHTML = '<div class="loader"></div><span>Doing the hard work for you...</span>';
             resultsDiv.innerHTML = '';
             submitButton.disabled = true;
@@ -160,9 +158,9 @@
                 }
 
                 const rawData = await response.json();
-                dataObject = Array.isArray(rawData) ? rawData[0] : rawData;
+                const dataObject = Array.isArray(rawData) ? rawData[0] : rawData;
                 displayResults(dataObject);
-                statusDiv.innerHTML = ''; // Clear status on success
+                statusDiv.innerHTML = '';
 
             } catch (error) {
                 console.error('Error:', error);
@@ -172,8 +170,18 @@
             }
         });
 
+        // --- NEW displayResults function to handle the improved AI output ---
         function displayResults(data) {
             resultsDiv.innerHTML = '';
+            
+            // Helper function to format currency values safely
+            const formatCurrency = (costObject) => {
+                if (costObject && costObject.value !== null && costObject.value !== undefined) {
+                    return `${costObject.value} ${costObject.currency || ''}`;
+                }
+                return 'N/A'; // Return N/A if object is null or has no value
+            };
+
             let html = '<h2>Extraction Results</h2>';
 
             if (data.invoices && data.invoices.length > 0) {
@@ -182,29 +190,33 @@
                         <thead>
                             <tr>
                                 <th>Invoice Number</th>
-                                <th>Invoice Value</th>
+                                <th>Freight Cost</th>
+                                <th>Insurance Cost</th>
+                                <th>Incoterm</th>
+                                <th>Total Amount</th>
                             </tr>
                         </thead>
                         <tbody>`;
                 
-                // Add a row for each invoice
                 data.invoices.forEach(invoice => {
                     html += `
                         <tr>
                             <td>${invoice.invoiceNumber || 'N/A'}</td>
-                            <td>${invoice.totalAmount || 'N/A'}</td>
+                            <td>${formatCurrency(invoice.freightCost)}</td>
+                            <td>${formatCurrency(invoice.insuranceCost)}</td>
+                            <td>${invoice.incoterm || 'N/A'}</td>
+                            <td>${formatCurrency(invoice.totalAmount)}</td>
                         </tr>`;
                 });
 
                 html += `</tbody>`;
 
-                // --- IMPROVEMENT: Grand Total is now the last row in the table footer ---
                 if (data.grandTotal) {
                     html += `
                         <tfoot>
                             <tr>
-                                <td>Grand Total</td>
-                                <td>${data.grandTotal}</td>
+                                <td colspan="4">Grand Total</td>
+                                <td>${formatCurrency(data.grandTotal)}</td>
                             </tr>
                         </tfoot>`;
                 }
@@ -212,14 +224,9 @@
                 html += `</table>`;
             }
 
-            // Notes section remains the same
             if (data.notes) {
                 const formattedNotes = data.notes.replace(/\n/g, '<br>');
-                html += `
-                    <div style="margin-top: 20px;">
-                        <h4>Notes from AI:</h4>
-                        <p style="font-style: italic; white-space: pre-wrap;">${formattedNotes}</p>
-                    </div>`;
+                html += `<div style="margin-top: 20px;"><h4>Notes from AI:</h4><p style="font-style: italic; white-space: pre-wrap;">${formattedNotes}</p></div>`;
             }
 
             resultsDiv.innerHTML = html;
