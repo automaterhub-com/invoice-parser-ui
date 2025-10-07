@@ -159,8 +159,9 @@
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
 
-                const responseArray = await response.json(); 
-                displayResults(responseArray[0]);
+                const rawData = await response.json();
+                dataObject = Array.isArray(rawData) ? rawData[0] : rawData;
+                displayResults(dataObject);
                 statusDiv.innerHTML = ''; // Clear status on success
 
             } catch (error) {
