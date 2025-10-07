@@ -13,107 +13,49 @@
             color: #333;
         }
         #container { 
-            max-width: 900px; /* Widened for more columns */
+            max-width: 900px;
             margin: auto; 
             padding: 30px; 
             background: white; 
             border-radius: 12px; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
         }
+
+        /* --- ADD THIS CSS FOR THE LOGO --- */
+        .logo-img {
+            display: block;
+            margin: 0 auto 25px auto; /* Centers the logo and adds space below */
+            height: 50px; /* Adjust this value to resize your logo */
+        }
+        
         h1 { 
             text-align: center; 
             color: #2c3e50;
+            margin-top: 0;
         }
-
-        /* Form Styles */
-        form { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-        }
-        input[type="file"] { 
-            border: 2px dashed #dde3ec; 
-            padding: 20px; 
-            border-radius: 8px; 
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        input[type="file"]:hover {
-            border-color: #007bff;
-            background-color: #f8f9fa;
-        }
-        button { 
-            padding: 12px 20px; 
-            background-color: #007bff; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 16px; 
-            font-weight: 500;
-            transition: background-color 0.2s ease;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        button:disabled { 
-            background-color: #a0a0a0; 
-            cursor: not-allowed;
-        }
-
-        /* Status & Spinner Styles */
-        #status {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            text-align: center; 
-            font-style: italic; 
-            color: #555; 
-            margin-top: 20px;
-            height: 30px;
-        }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Table Styles */
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 20px; 
-        }
-        th, td { 
-            border: 1px solid #e1e1e1; 
-            padding: 12px; 
-            text-align: left; 
-        }
-        th { 
-            background-color: #f2f6fa; 
-            font-weight: 600;
-        }
-        tbody tr:hover {
-            background-color: #f9f9f9;
-        }
-        tfoot {
-            font-weight: bold;
-            background-color: #f8f9fa;
-        }
+        /* ... (rest of your CSS is the same) ... */
+        form { display: flex; flex-direction: column; gap: 15px; }
+        input[type="file"] { border: 2px dashed #dde3ec; padding: 20px; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
+        input[type="file"]:hover { border-color: #007bff; background-color: #f8f9fa; }
+        button { padding: 12px 20px; background-color: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 500; transition: background-color 0.2s ease; }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #a0a0a0; cursor: not-allowed; }
+        #status { display: flex; justify-content: center; align-items: center; gap: 10px; text-align: center; font-style: italic; color: #555; margin-top: 20px; height: 30px; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #e1e1e1; padding: 12px; text-align: left; }
+        th { background-color: #f2f6fa; font-weight: 600; }
+        tbody tr:hover { background-color: #f9f9f9; }
+        tfoot { font-weight: bold; background-color: #f8f9fa; }
     </style>
 </head>
 <body>
 
-    <!-- Main application container, now visible by default -->
     <div id="container">
+        <!-- --- ADD THIS LINE FOR THE LOGO --- -->
+        <img src="logo.png" alt="Company Logo" class="logo-img">
+
         <h1>Invoice Data Extractor</h1>
         <form id="uploadForm">
             <label for="invoiceFile">Attach your invoice file:</label>
@@ -125,12 +67,13 @@
     </div>
 
     <script>
+        // --- Your JavaScript does not need any changes ---
         const uploadForm = document.getElementById('uploadForm');
+        // ... (rest of your script)
         const invoiceFile = document.getElementById('invoiceFile');
         const statusDiv = document.getElementById('status');
         const resultsDiv = document.getElementById('results');
         const submitButton = uploadForm.querySelector('button');
-
         const webhookUrl = 'https://n8n.automaterhub.com/webhook/99983a7d-9ed1-46a5-87f1-282d3ef2f181';
 
         uploadForm.addEventListener('submit', async (e) => {
@@ -139,29 +82,23 @@
                 statusDiv.textContent = 'Please select a file first.';
                 return;
             }
-
             statusDiv.innerHTML = '<div class="loader"></div><span>Doing the hard work for you...</span>';
             resultsDiv.innerHTML = '';
             submitButton.disabled = true;
-
             const formData = new FormData();
             formData.append('file', invoiceFile.files[0]);
-
             try {
                 const response = await fetch(webhookUrl, {
                     method: 'POST',
                     body: formData,
                 });
-
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-
                 const rawData = await response.json();
                 const dataObject = Array.isArray(rawData) ? rawData[0] : rawData;
                 displayResults(dataObject);
                 statusDiv.innerHTML = '';
-
             } catch (error) {
                 console.error('Error:', error);
                 statusDiv.textContent = 'An error occurred. Please try again.';
@@ -170,65 +107,30 @@
             }
         });
 
-        // --- NEW displayResults function to handle the improved AI output ---
         function displayResults(data) {
             resultsDiv.innerHTML = '';
-            
-            // Helper function to format currency values safely
             const formatCurrency = (costObject) => {
                 if (costObject && costObject.value !== null && costObject.value !== undefined) {
                     return `${costObject.value} ${costObject.currency || ''}`;
                 }
-                return 'N/A'; // Return N/A if object is null or has no value
+                return 'N/A';
             };
-
             let html = '<h2>Extraction Results</h2>';
-
             if (data.invoices && data.invoices.length > 0) {
-                html += `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Invoice Number</th>
-                                <th>Freight Cost</th>
-                                <th>Insurance Cost</th>
-                                <th>Incoterm</th>
-                                <th>Total Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>`;
-                
+                html += `<table><thead><tr><th>Invoice Number</th><th>Freight Cost</th><th>Insurance Cost</th><th>Incoterm</th><th>Total Amount</th></tr></thead><tbody>`;
                 data.invoices.forEach(invoice => {
-                    html += `
-                        <tr>
-                            <td>${invoice.invoiceNumber || 'N/A'}</td>
-                            <td>${formatCurrency(invoice.freightCost)}</td>
-                            <td>${formatCurrency(invoice.insuranceCost)}</td>
-                            <td>${invoice.incoterm || 'N/A'}</td>
-                            <td>${formatCurrency(invoice.totalAmount)}</td>
-                        </tr>`;
+                    html += `<tr><td>${invoice.invoiceNumber || 'N/A'}</td><td>${formatCurrency(invoice.freightCost)}</td><td>${formatCurrency(invoice.insuranceCost)}</td><td>${invoice.incoterm || 'N/A'}</td><td>${formatCurrency(invoice.totalAmount)}</td></tr>`;
                 });
-
                 html += `</tbody>`;
-
                 if (data.grandTotal) {
-                    html += `
-                        <tfoot>
-                            <tr>
-                                <td colspan="4">Grand Total</td>
-                                <td>${formatCurrency(data.grandTotal)}</td>
-                            </tr>
-                        </tfoot>`;
+                    html += `<tfoot><tr><td colspan="4">Grand Total</td><td>${formatCurrency(data.grandTotal)}</td></tr></tfoot>`;
                 }
-                
                 html += `</table>`;
             }
-
             if (data.notes) {
                 const formattedNotes = data.notes.replace(/\n/g, '<br>');
                 html += `<div style="margin-top: 20px;"><h4>Notes from AI:</h4><p style="font-style: italic; white-space: pre-wrap;">${formattedNotes}</p></div>`;
             }
-
             resultsDiv.innerHTML = html;
         }
     </script>
